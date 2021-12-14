@@ -1,0 +1,61 @@
+sample_ID,Fly,Origin,AB treated,Age,Line,Diet,Location
+L1,10,Lab,AB-,3,Young lab,SLP,NA
+L2,11,Lab,AB-,3,Young lab,SLP,NA
+L3,12,Lab,AB-,3,Young lab,SLP,NA
+L4,4,Lab,AB-,3,Young lab,Glucose,NA
+L5,5,Lab,AB-,3,Young lab,Glucose,NA
+L6,6,Lab,AB-,3,Young lab,Glucose,NA
+L7,7,Lab,AB-,3,Young lab,Starch,NA
+L8,8,Lab,AB-,3,Young lab,Starch,NA
+L9,9,Lab,AB-,3,Young lab,Starch,NA
+L10,1,Lab,AB-,3,Young lab,SHP,NA
+L11,2,Lab,AB-,3,Young lab,SHP,NA
+L12,3,Lab,AB-,3,Young lab,SHP,NA
+AB0,25,Lab,AB+,3,AB treated,SHP,NA
+AB1,26,Lab,AB+,3,AB treated,SHP,NA
+AB2,27,Lab,AB+,3,AB treated,SHP,NA
+AB3,28,Lab,AB+,3,AB treated,Glucose,NA
+AB4,29,Lab,AB+,3,AB treated,Glucose,NA
+AB5,30,Lab,AB+,3,AB treated,Glucose,NA
+AB6,31,Lab,AB+,3,AB treated,Starch,NA
+AB7,32,Lab,AB+,3,AB treated,Starch,NA
+AB8,33,Lab,AB+,3,AB treated,Starch,NA
+AB9,34,Lab,AB+,3,AB treated,SLP,NA
+AB10,35,Lab,AB+,3,AB treated,SLP,NA
+AB11,36,Lab,AB+,3,AB treated,SLP,NA
+WMA,37,Wild,AB-,3,Wild,Argan,Morocco
+WMB,38,Wild,AB-,3,Wild,Argan,Morocco
+WMC,39,Wild,AB-,3,Wild,Argan,Morocco
+WMD,40,Wild,AB-,3,Wild,Peach,Lehonia
+WME,41,Wild,AB-,3,Wild,Peach,Lehonia
+WMF,42,Wild,AB-,3,Wild,Peach,Lehonia
+WMG,43,Wild,AB-,3,Wild,Orange,Chania
+WMH,44,Wild,AB-,3,Wild,Orange,Chania
+WMI,45,Wild,AB-,3,Wild,Orange,Chania
+WMJ,46,Wild,AB-,3,Wild,GF,Chania
+WMK,47,Wild,AB-,3,Wild,GF,Chania
+WML,48,Wild,AB-,3,Wild,GF,Chania
+WMM,49,Wild,AB-,3,Wild,Apricot,Chania
+WMN,50,Wild,AB-,3,Wild,Apricot,Chania
+WMO,51,Wild,AB-,3,Wild,Apricot,Chania
+WMP,52,Wild,AB-,3,Wild,Apricot,Lehonia
+WMQ,53,Wild,AB-,3,Wild,Apricot,Lehonia
+WMR,54,Wild,AB-,3,Wild,Apricot,Lehonia
+WMS,55,Wild,AB-,3,Wild,Tang,Lehonia
+WMT,56,Wild,AB-,3,Wild,Tang,Lehonia
+WMU,57,Wild,AB-,3,Wild,Tang,Lehonia
+WMV,58,Wild,AB-,3,Wild,Orange,Chania
+WMX,59,Wild,AB-,3,Wild,Orange,Chania
+WMY,60,Wild,AB-,3,Wild,Orange,Chania
+OLDA,22,Lab,AB-,10,Old Lab,SLP,NA
+OLDB,23,Lab,AB-,10,Old Lab,SLP,NA
+OLDC,24,Lab,AB-,10,Old Lab,SLP,NA
+OLDD,16,Lab,AB-,10,Old Lab,Glucose,NA
+OLDE,17,Lab,AB-,10,Old Lab,Glucose,NA
+OLDF,18,Lab,AB-,10,Old Lab,Glucose,NA
+OLDG,19,Lab,AB-,10,Old Lab,Starch,NA
+OLDH,20,Lab,AB-,10,Old Lab,Starch,NA
+OLDI,21,Lab,AB-,10,Old Lab,Starch,NA
+OLDJ,13,Lab,AB-,10,Old Lab,SHP,NA
+OLDK,14,Lab,AB-,10,Old Lab,SHP,NA
+OLDL,15,Lab,AB-,10,Old Lab,SHP,NA

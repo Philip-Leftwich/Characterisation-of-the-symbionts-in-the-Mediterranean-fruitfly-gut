@@ -1,0 +1,222 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(forcats)
+library(ggplot2)
+library(vegan) # ecological diversity analysis
+library(dplyr)
+library(scales) # scale functions for vizualizations
+library(grid)
+library(reshape2) # data manipulation package
+library(cowplot)
+library(phyloseq)
+library(viridis)
+library(RColorBrewer)
+library(wesanderson)
+library(patchwork)
+library(here)
+###necessary packages
+
+source(here("scripts","functions.R"))
+```
+
+
+
+```{r}
+ OTU<- read.table(here("data", "OTU1.csv"), sep=',', header=T)
+ TAX <- read.table(here("data", "TAX1.csv"), sep=',', header=T)
+ VOL<- data.matrix(OTU, rownames.force = NA)
+ 
+
+ # Name the Columns based on OTU numer
+ rownames(VOL)<- paste0("OTU", 1:nrow(VOL))
+ LSU<- as.matrix(TAX, rownames.force = NA)
+ rownames(LSU)<- paste0("OTU", 1:nrow(LSU))
+ 
+ OTU = otu_table(VOL, taxa_are_rows = TRUE)
+ TAX = tax_table(LSU)
+ 
+ physeq = phyloseq(OTU, TAX)
+ physeq
+ 
+metadata=read.csv(here("data", "Medfly_metafile_2.csv"))
+metadata$Fly=as.factor(metadata$Fly) 
+sampdat <- sample_data(metadata)
+rownames(sampdat) <- sampdat$sample_ID
+
+physeq=merge_phyloseq(physeq,sampdat)
+
+```
+
+
+Bar plot of the top 20 most frequent OTUs across all samples identified to Genus level
+
+```{r}
+top20otus <- names(sort(taxa_sums(physeq),decreasing=TRUE))[1:20]
+
+taxtab20 <- cbind(tax_table(physeq), genus_20="Unclassified")
+
+taxtab20[top20otus, "genus_20"] <- as(tax_table(physeq)[top20otus, "Genus"],
+"character")
+tax_table(physeq) <- tax_table(taxtab20)
+
+ps.top20 <- transform_sample_counts(physeq, function(OTU) OTU/sum(OTU))
+
+### turn into tibble
+medfly_genus <- ps.top20 %>%
+  tax_glom(taxrank = "genus_20") %>%                     # agglomerate at genus level
+  psmelt() %>%                                         # Melt to long format
+  arrange(genus_20)                                      # Sort data frame alphabetically by phylum
+```
+
+
+
+```{r}
+
+medfly_genus <- medfly_genus %>%
+    mutate(genus_20=fct_relevel(genus_20, "Acinetobacter","Klebsiella","Pantoea","Pseudoxanthomonas","Serratia","Stenotrophomonas","Betaproteobacteria_unclassified","Bordetella","Delftia","Limnobacter","Commensalibacter","Sphingobium","Sphingomonas","Bacillus_cereus_group","Staphylococcus","Enterococcus_unclassified","Mycoplasma","Sphingobacterium", "Unclassified")) 
+
+Wild <- filter(medfly_genus, Line=="Wild")
+Young <- filter(medfly_genus, Line=="Young lab")
+Old <- filter(medfly_genus, Line=="Old Lab")
+AB <- filter(medfly_genus, Line=="AB treated")
+
+
+
+coul <- c(
+"#A6CEE3", 
+"#5199AA", 
+"#99CD91", 
+"#74BE60", 
+"#5BA444", 
+"#B89B74", 
+"#E76F68",
+"#E83F3A", 
+"#F06C45", 
+"#FAA351", 
+"#FA9530", 
+"#ED8F47", 
+"#C79EB0", 
+"#9977B2", 
+"#825D99",
+"#CDBB91",
+"#FFFF99",
+"#D7AF68", 
+"#B15928"
+)
+
+abund_plot <- function(data=data){
+ggplot(aes(x=Fly, y=Abundance, fill=genus_20), data=data) + 
+    geom_bar(stat="identity", position=position_stack(reverse=TRUE))+ 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+ #### reverse stacked order of plots
+    theme_classic()+
+    theme(axis.title.x=element_blank(),axis.title.y=element_blank(),axis.text.y=element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),axis.text.x =  element_blank(), axis.ticks.x =  element_blank(), axis.ticks.y=element_blank(), axis.line.y=element_blank())+ ### white background
+    theme(plot.margin = unit(c(10,1,80,1), "pt"))+  ### expand bottom margin of plot
+    scale_y_continuous(expand=c(0,0),labels=c("0","0.25","0.5","0.75","1"))+ 
+  facet_wrap(~Diet, scales = "free_x", nrow=1)+
+    scale_fill_manual(values=coul, name="Genus", labels=c("Acinetobacter","Klebsiella","Pantoea","Pseudoxanthomonas","Serratia","Stenotrophomonas","Burkholderia","Bordetella","Delftia","Limnobacter","Commensalibacter","Sphingobium","Sphingomonas","Bacillus","Staphylococcus","Enterococcus","Mycoplasma","Sphingobacterium","Other"))+
+    theme(plot.title=element_text(hjust=0.5))+theme(plot.title=element_textbox(hjust=0.5,vjust=0.1))+
+  theme(legend.title=element_text(size=16), legend.text=element_text(size=14))
+}
+  
+wild_plot <- abund_plot(Wild) +
+  ggtitle("Wild Flies")
+young_plot <- abund_plot(Young) +
+  ggtitle("3 day old ~ Lab flies")
+old_plot <- abund_plot(Old) +
+   ggtitle("10 day old ~ Lab flies")
+ab_plot <- abund_plot(AB) +
+   ggtitle("Antibiotic treated ~ Lab flies")+
+  labs(y="Relative Abundance")+
+  theme(axis.title.y=element_text(size=16, angle=90),axis.text.y=element_text(size=14), axis.ticks.y=element_line(),  axis.line.y=element_line())
+
+barplot <- (ab_plot+young_plot+old_plot+wild_plot)+plot_layout(guides="collect", nrow=1)&
+  theme(legend.position="bottom")
+  barplot <- barplot+plot_layout(tag_level="new")
+
+```
+ 
+
+
+```{r}
+# running ndms 
+medfly_otu_nmds <- ordinate(physeq, "NMDS", "bray")
+
+
+```
+Let’s run the plot_ordination command on the samples instead of the OTUs. We can use the same ordination object as above.
+```{r}
+####
+sampleord <- plot_ordination(physeq, medfly_otu_nmds,
+                type="Sample_ID",
+                )
+sampleord$layers <- sampleord$layers[-1]
+
+    geom_point(aes(fill=Line), colour="black", position=position_jitterdodge(dodge.width=0.9),pch=21) 
+
+sampleord <- plot_ordination(physeq, medfly_otu_nmds,
+                type="Sample_ID",
+                )   
+    
+
+ordination_plot <- sampleord+stat_ellipse(geom="polygon", type="norm",linetype=2, size=1.2, alpha=0.2,aes(fill=Line, colour=Line), show.legend=FALSE)+
+  theme(panel.grid.major = element_blank(), panel.grid.minor=element_blank(), panel.background=element_blank())+
+geom_point(aes(fill=Line), colour="white", size=2,  pch=21, stroke=0.6)+
+  theme(axis.line=element_line(colour="black")) + scale_x_continuous(breaks=c(-1,1))+scale_y_continuous(breaks=c(-1,1))+
+  theme_classic()+
+    theme(axis.title.x =element_text(size=16),axis.title.y =element_text(size=16),axis.text.y= element_text(size=16),axis.text.x= element_text(size=16),panel.grid.major = element_blank(), legend.title =element_text(size=16), panel.grid.minor = element_blank())
+
+
+ordination_plot <- ordination_plot+theme(legend.position="none")+scale_fill_manual(values=c("darkorange","darkblue", "cyan4","purple"))+scale_color_manual(values=c("darkorange","darkblue", "cyan4","purple"))
+
+
+```
+
+
+
+```{r}
+ ### Estimate lots of alpha diversity measures     
+      medfly_richness<-estimate_richness(physeq)
+
+
+medfly_richness$sample_ID<-rownames(medfly_richness)
+
+
+###dplyr function to join medfly richness and metadata by a shared identifier
+medfly_richness<-left_join(medfly_richness,metadata,"sample_ID")
+
+  
+medfly_richness$Line <- recode_factor(medfly_richness$Line, `AB treated`="Ab treated", `Young lab`="3 day old Lab", `Old Lab`="10 day old Lab", `Wild`="Wild flies")
+
+####then run a glm on this new dataset to look at significant predictors of community richness
+
+
+
+###box plot and jitter
+boxplot <- ggplot(data=medfly_richness, aes(x = Line, y = Shannon, fill=Line))+
+  scale_y_continuous(name="Shannon Index", breaks=c(0,0.5,1,1.5,2), labels=c("0","0.5","1","1.5","2")) +theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.border=element_blank(), panel.background=element_blank())+theme(axis.text.x = element_text(size=14), axis.text.y=element_text(size=14), axis.title.y=element_text(size=16))+theme(axis.line.x = element_line(color="black"),axis.line.y = element_line(color="black"))+labs(y="", x="")+
+      geom_boxplot(outlier.colour = NA, alpha=0.6, width=0.4,
+                        position = position_dodge(width=0.6))+
+    geom_point(aes(fill=Line), colour="white", position=position_jitterdodge(dodge.width=0.9),pch=21, stroke=0.5,size=2,show.legend = FALSE)
+
+
+
+boxplot <- boxplot+theme(legend.title = element_blank(),legend.key = element_blank(), legend.text=element_text(size=16))+scale_fill_manual(values=c("darkorange","purple", "darkblue", "cyan4"))
+```
+
+
+
+```{r} 
+### 
+(ordination_plot+boxplot)/barplot +plot_annotation(tag_levels=list(c("A","B"),"C")) & theme(plot.tag=element_text(size=20))
+
+## ggsave("Figure1.png", type="cairo", width=15.9, height=8.23, units="in", dpi=600)
+# Saving 16.6 x 8.23 in image
+```
