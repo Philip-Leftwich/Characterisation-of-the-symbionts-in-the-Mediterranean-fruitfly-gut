@@ -27,7 +27,7 @@ library(here)
 source(here("scripts","functions.R"))
 ```
 
-
+Generate phyloseq object
 
 ```{r}
  OTU<- read.table(here("data", "OTU1.csv"), sep=',', header=T)
@@ -56,7 +56,7 @@ physeq=merge_phyloseq(physeq,sampdat)
 ```
 
 
-Bar plot of the top 20 most frequent OTUs across all samples identified to Genus level
+Extract the top 20 most frequent OTUs across all samples identified to Genus level
 
 ```{r}
 top20otus <- names(sort(taxa_sums(physeq),decreasing=TRUE))[1:20]
@@ -77,6 +77,7 @@ medfly_genus <- ps.top20 %>%
 ```
 
 
+Generating barplots of OTU abundancy across the four main treatments
 
 ```{r}
 
@@ -143,7 +144,7 @@ barplot <- (ab_plot+young_plot+old_plot+wild_plot)+plot_layout(guides="collect",
 
 ```
  
-
+NMDS of microbiome profiles
 
 ```{r}
 # running ndms 
@@ -151,7 +152,10 @@ medfly_otu_nmds <- ordinate(physeq, "NMDS", "bray")
 
 
 ```
-Let’s run the plot_ordination command on the samples instead of the OTUs. We can use the same ordination object as above.
+
+
+Running plot ordination on samples
+
 ```{r}
 ####
 sampleord <- plot_ordination(physeq, medfly_otu_nmds,
@@ -180,6 +184,7 @@ ordination_plot <- ordination_plot+theme(legend.position="none")+scale_fill_manu
 ```
 
 
+Alpha diversity measures of species richness
 
 ```{r}
  ### Estimate lots of alpha diversity measures     
@@ -195,7 +200,7 @@ medfly_richness<-left_join(medfly_richness,metadata,"sample_ID")
   
 medfly_richness$Line <- recode_factor(medfly_richness$Line, `AB treated`="Ab treated", `Young lab`="3 day old Lab", `Old Lab`="10 day old Lab", `Wild`="Wild flies")
 
-####then run a glm on this new dataset to look at significant predictors of community richness
+
 
 
 
@@ -212,10 +217,15 @@ boxplot <- boxplot+theme(legend.title = element_blank(),legend.key = element_bla
 ```
 
 
+Patchwork assembly of all three plots
 
-```{r} 
+```{r, fig.width=15, fig.height=9} 
 ### 
 (ordination_plot+boxplot)/barplot +plot_annotation(tag_levels=list(c("A","B"),"C")) & theme(plot.tag=element_text(size=20))
+```
+
+
+```{r}
 
 ## ggsave("Figure1.png", type="cairo", width=15.9, height=8.23, units="in", dpi=600)
 # Saving 16.6 x 8.23 in image
