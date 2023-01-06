@@ -1,5 +1,7 @@
 # Characterisation of the symbionts in the Mediterranean fruitfly gut
 
+[![DOI](https://zenodo.org/badge/375613462.svg)](https://zenodo.org/badge/latestdoi/375613462)
+
 # Journal: Microbial Genomics
 
 # Darrington, M., [Leftwich, P.T.](https://github.com/Philip-Leftwich), Holmes, N.A., Friend, L.A., Clarke N.V.E., Worsley, S.F., Margaritopolous, J.T. , Hogenhout, S.A., Hutchings, M.I., & Chapman, T
